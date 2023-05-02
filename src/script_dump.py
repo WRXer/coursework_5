@@ -1,7 +1,10 @@
+from src.auth_data import user, password
+
 import psycopg2
 
+
 # Установка соединения с БД
-conn = psycopg2.connect(host="localhost", database="hh_db", user="postgres", password="777Nokia13")
+conn = psycopg2.connect(host="localhost", database="hh_db", user=user, password=password)
 
 try:
     with conn:
@@ -24,7 +27,7 @@ try:
             for vacancy in vacancies_data:
                 cur.execute(
                     """
-                    INSERT INTO vacancies (name, description, salary, employer_id, area, vac_url)
+                    INSERT INTO vacancies (name, area, vac_url, description, salary, employer_id )
                     VALUES (%s, %s, %s, %s, %s, %s)
                     """,
                     vacancy

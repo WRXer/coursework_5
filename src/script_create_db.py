@@ -1,10 +1,11 @@
 """Скрипт для заполнения данными таблиц в БД Postgres."""
 import psycopg2
+from src.auth_data import user, password
 import csv
 
 def create_db():
     #connect to db подключение к бд
-    conn = psycopg2.connect(host="localhost", database="hh_db", user="postgres", password="777Nokia13")
+    conn = psycopg2.connect(host="localhost", database="hh_db", user=user, password=password)
 
     try:
         with conn:
@@ -27,11 +28,12 @@ def create_db():
                     CREATE TABLE vacancies (
                         id SERIAL PRIMARY KEY,
                         name VARCHAR(255) NOT NULL,
+                        area VARCHAR(50) NOT NULL,
+                        vac_url VARCHAR(255),
                         description TEXT,
                         salary NUMERIC(10, 2),
                         employer_id INTEGER REFERENCES employers(id) ON DELETE CASCADE,
-                        area VARCHAR(50) NOT NULL,
-                        vac_url VARCHAR(255)
+                        
                         )
                     """
                 )     # Создание таблицы вакансий
