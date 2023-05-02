@@ -30,13 +30,13 @@ class HH(Engine):
             vacancies = response.json()["items"]
             for vacancy in vacancies:
                 if vacancy['employer']['name'] == self._search_query:
-                    print(vacancy['employer'])
-                if vacancy['salary'] is not None:
-                    vacancy_data = {'name': vacancy['name'], 'url': vacancy['url'],
-                                    'description': vacancy['snippet']['requirement'], 'payment': vacancy['salary']}
-                    self.vacancies_data.append(vacancy_data)
-                else:
-                    continue
+                    #print(vacancy)
+                    if vacancy['salary'] is not None:
+                        vacancy_data = {'employer': vacancy['employer']['name'], 'name': vacancy['name'], 'area': vacancy['area']['name'], 'url': vacancy['url'],
+                                        'description': vacancy['snippet']['requirement'], 'payment': vacancy['salary']}
+                        self.vacancies_data.append(vacancy_data)
+                    else:
+                        continue
         else:
             print("Error:", response.status_code)
         return self.vacancies_data
