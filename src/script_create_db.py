@@ -14,10 +14,9 @@ def create_db():
                     """
                     CREATE TABLE employers (
                         id SERIAL PRIMARY KEY,
+                        emp_id integer,
                         name VARCHAR(255) NOT NULL,
-                        description TEXT,
-                        email VARCHAR(255) UNIQUE NOT NULL,
-                        phone VARCHAR(20),
+                        emp_address VARCHAR(50),
                         emp_url VARCHAR(255)
                     )
                     """
@@ -31,10 +30,10 @@ def create_db():
                         area VARCHAR(50) NOT NULL,
                         vac_url VARCHAR(255),
                         description TEXT,
-                        salary NUMERIC(10, 2),
-                        employer_id INTEGER REFERENCES employers(id) ON DELETE CASCADE,
-                        
-                        )
+                        salary_from INTEGER,
+                        salary_to INTEGER,
+                        employer_id INTEGER NOT NULL
+                    )
                     """
                 )     # Создание таблицы вакансий
 

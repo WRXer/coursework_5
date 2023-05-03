@@ -32,8 +32,9 @@ class HH(Engine):
                 if vacancy['employer']['name'] == self._search_query:
                     #print(vacancy)
                     if vacancy['salary'] is not None:
-                        vacancy_data = {'employer': {'name': vacancy['employer']['name'], 'emp_url': vacancy['employer']['url']}, 'vacancy':{'name': vacancy['name'], 'area': vacancy['area']['name'], 'url': vacancy['url'],
-                                        'description': vacancy['snippet']['requirement'], 'payment': vacancy['salary']}}
+                        vacancy_data = {'employer': {'id': vacancy['employer']['id'], 'name': vacancy['employer']['name'], 'address': vacancy['address'], 'emp_url': vacancy['employer']['url']},
+                                        'vacancy':{'name': vacancy['name'], 'area': vacancy['area']['name'], 'url': vacancy['url'],
+                                        'description': vacancy['snippet']['requirement'],  'payment_from': vacancy['salary']['from'], 'payment_to': vacancy['salary']['to']}}
                         self.vacancies_data.append(vacancy_data)
                     else:
                         continue
