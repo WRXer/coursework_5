@@ -11,13 +11,11 @@ def create_db(database_name: str):
         conn = psycopg2.connect(dbname='postgres', user=user, password=password)    #connect to db подключение к бд
         conn.autocommit = True
         cur = conn.cursor()
-
         cur.execute(f"CREATE DATABASE {database_name}")
     except psycopg2.errors.DuplicateDatabase:
         print('ОШИБКА:  база данных "sky" уже существует')
     finally:
         conn.close()
-
 
     conn = psycopg2.connect(host="localhost", database=database_name, user=user, password=password)
     try:
@@ -48,7 +46,5 @@ def create_db(database_name: str):
                     )
                     """
                 )     # Создание таблицы вакансий
-
-
     finally:
         conn.close()    #close connection to db закрываем соединение

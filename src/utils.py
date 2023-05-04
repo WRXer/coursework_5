@@ -2,6 +2,8 @@ from src.engine_classes import HH
 from src.sql.script_create_db import create_db
 from src.sql.script_dump import dump_db
 from src.sql.unique_params import create_params
+from src.auth_data import user, password
+
 
 import psycopg2
 
@@ -36,7 +38,15 @@ def db_choice():
             try:
                 database_name = input("Введите название новой БД или 'stop' для продолжения со старой БД\n")
                 if database_name.lower() == 'stop':
-                    database_name = input("Введите название старой БД\n")
+                    while True:
+                        try:
+                            database_name = input("Введите название старой БД\n")
+                            conn = psycopg2.connect(host="localhost", database=database_name, user=user,
+                                                    password=password)
+                            conn.close()
+                            break
+                        except psycopg2.OperationalError:
+                            print("БД с таким именем отсутствует")
                     break
                 else:
                     create_db(database_name)
@@ -45,8 +55,16 @@ def db_choice():
                     break
             except psycopg2.errors.DuplicateTable:
                 print('ОШИБКА:  отношение уже существует!')
-    if s_c == 2:
-        database_name = input("Введите название старой БД\n")
+    elif s_c == 2:
+        while True:
+            try:
+                database_name = input("Введите название старой БД\n")
+                conn = psycopg2.connect(host="localhost", database=database_name, user=user,
+                                        password=password)
+                conn.close()
+                break
+            except psycopg2.OperationalError:
+                print("БД с таким именем отсутствует")
     return database_name
 
 def employers_choice():
