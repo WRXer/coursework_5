@@ -2,16 +2,14 @@ from src.auth_data import user, password
 
 import psycopg2
 
-def dump_db(hh_vacancies):
-    # Установка соединения с БД
-    conn = psycopg2.connect(host="localhost", database="hh_db", user=user, password=password)
-
+def dump_db(hh_vacancies, database_name):
+    conn = psycopg2.connect(host="localhost", database=database_name, user=user, password=password)    #Установка соединения с БД
     try:
         with conn:
             with conn.cursor() as cur:  # create cursor
                 for employer in hh_vacancies:
                     if len(employer) > 1:
-                        print(employer['employer'])
+                        #print(employer['employer'])
                         employer_data = employer['employer']
                         if employer_data['address'] is not None:
                             cur.execute(

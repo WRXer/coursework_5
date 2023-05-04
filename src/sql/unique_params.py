@@ -2,9 +2,13 @@ import psycopg2
 from src.auth_data import user, password
 
 
-def create_params():
-    #connect to db подключение к бд
-    conn = psycopg2.connect(host="localhost", database="hh_db", user=user, password=password)
+def create_params(database_name: str):
+    """
+    Функция защиты от дублей в таблице
+    :param database_name:
+    :return:
+    """
+    conn = psycopg2.connect(host="localhost", database=database_name, user=user, password=password)    #connect to db подключение к бд
     try:
         with conn:
             with conn.cursor() as cur:    #create cursor

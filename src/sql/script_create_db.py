@@ -3,10 +3,23 @@ import psycopg2
 from src.auth_data import user, password
 import csv
 
-def create_db():
-    #connect to db подключение к бд
-    conn = psycopg2.connect(host="localhost", database="hh_db", user=user, password=password)
+def create_db(database_name: str):
+    """
+    Создание базы данных и таблиц для сохранения данных
+    """
+    try:
+        conn = psycopg2.connect(dbname='postgres', user=user, password=password)    #connect to db подключение к бд
+        conn.autocommit = True
+        cur = conn.cursor()
 
+        cur.execute(f"CREATE DATABASE {database_name}")
+    except psycopg2.errors.DuplicateDatabase:
+        print('ОШИБКА:  база данных "sky" уже существует')
+    finally:
+        conn.close()
+
+
+    conn = psycopg2.connect(host="localhost", database=database_name, user=user, password=password)
     try:
         with conn:
             with conn.cursor() as cur:    #create cursor
