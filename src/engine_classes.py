@@ -16,30 +16,38 @@ class Engine(ABC):
 class HH(Engine):
     def __init__(self, search_query: str):
         super().__init__(search_query)
-        self.vacancies_data = []
+        self.data = []
         self.url = "https://api.hh.ru/vacancies"
         self.params = {"text": self._search_query, "per_page": self._per_page}
 
     def get_request(self) -> list:
-        """
-        Функция парсинга данных с ХХ
-        :return:
-        """
-        response = requests.get(self.url, self.params)
-        if response.status_code == 200:
+        response = requests.get(self.url, self.params)    # Отправка запроса к API
+        if response.status_code == 200:    # Обработка ответа от API
             vacancies = response.json()["items"]
             for vacancy in vacancies:
                 if vacancy['employer']['name'] == self._search_query:
-                    #print(vacancy)
-                    if vacancy['salary'] is not None:
-                        vacancy_data = {'employer': {'id': vacancy['employer']['id'], 'name': vacancy['employer']['name'], 'address': vacancy['address'], 'emp_url': vacancy['employer']['url']},
-                                        'vacancy':{'name': vacancy['name'], 'area': vacancy['area']['name'], 'url': vacancy['url'],
-                                        'description': vacancy['snippet']['requirement'],  'payment_from': vacancy['salary']['from'], 'payment_to': vacancy['salary']['to']}}
-                        self.vacancies_data.append(vacancy_data)
-                    else:
-                        continue
+                    employer_id = vacancy['employer']['id']     # ID работодателя, для которого нужно получить список вакансий
+                    employer_one = {'id': vacancy['employer']['id'], 'name': vacancy['employer']['name'],
+                                                 'address': vacancy['address'], 'emp_url': vacancy['employer']['url']}
         else:
             print("Error:", response.status_code)
-        return self.vacancies_data
-        #vacancy['salary'] зарплата
-        #vacancy['snippet'] описание
+
+        url = f'https://api.hh.ru/vacancies?employer_id={employer_id}'    # URL запроса к API
+        response = requests.get(url, self.params)    # Отправка запроса к API
+        if response.status_code == 200:    # Обработка ответа от API
+            vacancies = response.json()['items']    # Извлечение списка вакансий из ответа
+            vacancies_for_employer = []    #Список вакансий по одному айди-работодателя
+            for vacancy in vacancies:
+                if vacancy['salary'] is not None:
+                    vac_data = {'name': vacancy['name'], 'area': vacancy['area']['name'], 'url': vacancy['url'], 'description': vacancy['snippet']['requirement'],
+                                                'payment_from': vacancy['salary']['from'],'payment_to': vacancy['salary']['to']}
+                    vacancies_for_employer.append(vac_data)
+                else:
+                    continue
+        else:
+            print(f'Ошибка запроса: {response.status_code}')
+        self.data.append({
+            'employer': employer_one,
+            'vacancies': vacancies_for_employer
+        })
+        return self.data
