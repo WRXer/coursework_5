@@ -1,7 +1,7 @@
-"""Скрипт для создания таблиц в БД Postgres."""
-import psycopg2
 from src.auth_data import user, password
-import csv
+
+import psycopg2
+
 
 def create_db(database_name: str):
     """

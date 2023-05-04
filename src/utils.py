@@ -3,7 +3,7 @@ from src.sql.script_create_db import create_db
 from src.sql.script_dump import dump_db
 from src.sql.unique_params import create_params
 from src.auth_data import user, password
-
+from src.sql.db_manager import DBManager
 
 import psycopg2
 
@@ -14,7 +14,7 @@ def start_choice():
     :return:
     """
     print("Для создания новой БД введите цифру '1'\nЕсли хотите работать со старой БД введите цифру '2'")
-    return 2
+    #return 2
     while True:
         choice_db = input()
         if choice_db == '1':
@@ -31,7 +31,7 @@ def db_choice():
     Функция по выбору Базы Данных
     :return:
     """
-    return 'teremok'
+    #return 'sky'
     s_c = start_choice()
     if s_c == 1:
         while True:
@@ -72,11 +72,12 @@ def employers_choice():
     Функция ввода названия компании, по которой будет совершаться поиск вакансий
     :return:
     """
+
     hh_data = []
     while True:
-        print("Если хотите найти вакансии: \nпо-новому работодателю: Нажмите '1'\nпо работодателям, установленным по умолчанию + новому: Нажмите '2'\nпо работодателям, установленным по умолчанию: Нажмите '3'\nдля выхода из данного меню: Нажмите '4'")
+        print("Если хотите найти вакансии: \nпо-новому работодателю: Нажмите '1'\nпо работодателям, установленным по умолчанию + новому: Нажмите '2'\nпо работодателям, установленным по умолчанию: Нажмите '3'\nДля выхода из данного меню: Нажмите '4'")
         user = input()
-        #user = '1'
+        #user = '4'
         if user == '1':
             while True:
                 try:
@@ -112,6 +113,40 @@ def employers_choice():
             print("Неверное значение! Введите цифру от 1 - 4!")
     return hh_data
 
+def db_manager_work(db):
+    """
+    Функция для работы с методами в полученных таблицах
+    :param db:
+    :return:
+    """
+    text_menu = "Для выхода из программы нажмите '1'\nДля получения списка всех компаний и количества вакансий у каждой компании нажмите '2'\nДля получения списка всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию нажмите '3'\nДля получения средней зарплаты по вакансиям нажмите '4'\nДля получения списка всех вакансий, у которых зарплата выше средней по всем вакансиям нажмите '5'\nДля получения списка всех вакансий, в названии которых содержатся переданные в метод слова, например “Инженер” нажмите '6'"
+    print(text_menu)
+    while True:
+        db_input = input()
+        if db_input == '1':
+            print('До свидания!')
+            break
+        elif db_input == '2':
+            db.get_companies_and_vacancies_count()    #получает список всех компаний и количество вакансий у каждой компании.
+            print("Для вызова меню нажмите '0'")
+        elif db_input == '3':
+            db.get_all_vacancies()    #получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию.
+            print("Для вызова меню нажмите '0'")
+        elif db_input == '4':
+            db.get_avg_salary()    #получает среднюю зарплату по вакансиям.
+            print("Для вызова меню нажмите '0'")
+        elif db_input == '5':
+            db.get_vacancies_with_higher_salary()    #получает список всех вакансий, у которых зарплата выше средней по всем вакансиям.
+            print("Для вызова меню нажмите '0'")
+        elif db_input == '6':
+            #user_input = 'Инженер'
+            user_input = input()
+            db.get_vacancies_with_keyword(user_input)    #получает список всех вакансий, в названии которых содержатся переданные в метод слова
+            print("Для вызова меню нажмите '0'")
+        elif db_input == '0':
+            print(text_menu)
+        else:
+            print("Неверное значение! Введите цифру от 1-6!")
 
 def main():
     print('Вас приветствует программа по работе с базой данных по плафторме hh.ru')
@@ -119,6 +154,6 @@ def main():
     hh_data = employers_choice()    #Поиск по названию компании
     if hh_data is not None:
         dump_db(hh_data, database_name)    #Заливка данных в таблы
-
-
+    db = DBManager(database_name)
+    db_manager_work(db)    #Работа с таблицей sql
 
