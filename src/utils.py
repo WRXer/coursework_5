@@ -20,11 +20,4 @@ def main():
         hh_vac = hh.get_request()
         hh_vacancies = hh_vacancies + hh_vac
     dump_db(hh_vacancies)
-    for v in hh_vacancies:
-        if len(v) > 1:
-            #if v['employer']['address'] is not None:
-            #    print(v['employer']['name'], v['employer']['address']['city'], v['employer']['emp_url'])
-            #else:
-            #    print(v['employer']['name'], v['employer']['address'], v['employer']['emp_url'])
-            #print(v['vacancy']['name'], v['vacancy']['area'], v['vacancy']['url'], v['vacancy']['description'], v['vacancy']['payment_from'], v['vacancy']['payment_to'])
-            continue
+

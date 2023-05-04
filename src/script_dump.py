@@ -5,47 +5,50 @@ import psycopg2
 def dump_db(hh_vacancies):
     # Установка соединения с БД
     conn = psycopg2.connect(host="localhost", database="hh_db", user=user, password=password)
-    employers_data = []
-    vacancies_data = []
-
-    for v in hh_vacancies:
-        if len(v) > 1:
-            z = (v['vacancy']['name'], v['vacancy']['area'], v['vacancy']['url'], v['vacancy']['description'],
-                 v['vacancy']['payment_from'], v['vacancy']['payment_to'], v['employer']['id'])
-            vacancies_data.append(z)
-            if v['employer']['address'] is not None:
-                x = (v['employer']['id'], v['employer']['name'], v['employer']['address']['city'], v['employer']['emp_url'])
-            else:
-                x = (v['employer']['id'], v['employer']['name'], v['employer']['address'], v['employer']['emp_url'])
-            employers_data.append(x)
 
     try:
         with conn:
             with conn.cursor() as cur:  # create cursor
-                # Добавление данных о работодателях
-                for employer in employers_data:
-                    employer = [None if value is None else value for value in employer]    # заменяем значения None на NULL
-                    cur.execute(
-                        """
-                        INSERT INTO employers (emp_id, name, emp_address, emp_url)
-                        VALUES (%s, %s, %s, %s)
-                        ON CONFLICT (name) DO UPDATE    
-                        SET emp_address = EXCLUDED.emp_address
-                        """,
-                        employer
-                    )
+                for employer in hh_vacancies:
+                    if len(employer) > 1:
+                        print(employer['employer'])
+                        employer_data = employer['employer']
+                        if employer_data['address'] is not None:
+                            cur.execute(
+                                """
+                                INSERT INTO employers (name, emp_address, emp_url)
+                                VALUES (%s, %s, %s)
+                                ON CONFLICT (name) DO UPDATE    
+                                SET emp_address = EXCLUDED.emp_address
+                                RETURNING employer_id
+                                """,
+                                (employer_data['name'], employer_data['address']['city'], employer_data['emp_url'])
+                            )    #Добавление данных о работодателях
+                        else:
+                            cur.execute(
+                                """
+                                INSERT INTO employers (name, emp_address, emp_url)
+                                VALUES (%s, %s, %s)
+                                ON CONFLICT (name) DO UPDATE    
+                                SET emp_address = EXCLUDED.emp_address
+                                RETURNING employer_id
+                                """,
+                                (employer_data['name'], employer_data['address'], employer_data['emp_url'])
+                            )    #Добавление данных о работодателях
 
-                # Добавление данных о вакансиях
-                for vacancy in vacancies_data:
-                    vacancy = [None if value is None else value for value in vacancy]    # заменяем значения None на NULL
-                    cur.execute(
-                        """
-                        INSERT INTO vacancies (name, area, vac_url, description, salary_from, salary_to, employer_id)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
-                        ON CONFLICT (vac_url) DO UPDATE    
-                        SET description = EXCLUDED.description
-                        """,
-                        vacancy
-                    )
+                        employer_id = cur.fetchone()[0]
+                        vacancies_data = employer['vacancies']
+                        for vacancy in vacancies_data:
+                            cur.execute(
+                                """
+                                INSERT INTO vacancies (employer_id, name, area, vac_url, description, salary_from, salary_to)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                ON CONFLICT (vac_url) DO UPDATE    
+                                SET description = EXCLUDED.description
+                                """,
+                                (employer_id, vacancy['name'], vacancy['area'], vacancy['url'],
+                                 vacancy['description'], vacancy['payment_from'], vacancy['payment_to'])
+                            )    # Добавление данных о вакансиях
+
     finally:
         conn.close()  # close connection to db закрываем соединение
